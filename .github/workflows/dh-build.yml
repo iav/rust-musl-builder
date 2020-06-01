@@ -70,18 +70,20 @@ jobs:
           df -h
           sudo systemctl start docker
 
+      - name: Log into registry
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin
+
       -
         name: Set up Docker Buildx
         id: buildx
-        uses: crazy-max/ghaction-docker-buildx@v1
+        uses: crazy-max/ghaction-docker-buildx@v2
         with:
-          version: latest
+          buildx-version: latest
+          skip-cache: false
+          qemu-version: latest
       -
         name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
-
-      - name: Log into registry
-        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin
 
       -
         name: Run Buildx
