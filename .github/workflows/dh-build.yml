@@ -99,7 +99,7 @@ jobs:
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
 
-# test push to repo
+          # test push to repo
           echo -e "from alpine\n  run echo hello! \n \n" | tee dtest
           docker buildx build -f dtest -t dtest -t shtripok/rust-musl-builder --load .
           docker push shtripok/rust-musl-builder
