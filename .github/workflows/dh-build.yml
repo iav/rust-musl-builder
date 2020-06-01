@@ -4,7 +4,7 @@ name: buildx for dockerhub
 # events but only for the master branch
 on:
   push:
-    #branches: [ master ]
+    branches: [ arm ]
 
     # Publish `v1.2.3` tags as releases.
     tags:
