@@ -43,13 +43,14 @@ jobs:
 #           ls -l /opt
 #           #dpkg-query -l
 
-#       - name: try to free some space
-#         run: |
-#           sudo apt-get remove -y cabal* gfortran* ghc* dotnet* libmono* mono* libmono* php* \
-#             clang* openjd* mongo* zulu*
-#           #llvm*
-#           sudo apt-get autoremove -y
-#           sudo df -h
+      - name: try to free some space
+        run: |
+          sudo apt-get remove -y cabal* gfortran* ghc* dotnet* libmono* mono* libmono* php* \
+            clang* openjd* mongo* zulu*
+          #llvm*
+          sudo apt-get autoremove -y
+          sudo df -h
+          dpkg-query -l
 
       -
         name: create small fs for docker cache
