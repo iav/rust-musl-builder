@@ -38,18 +38,18 @@ jobs:
           echo -e "{\n  \"experimental\": \"enabled\"\n}" | tee $HOME/.docker/config.json
           docker version
 
-      - name: list packages
-        run: |
-          ls -l /opt
-          #dpkg-query -l
+#       - name: list packages
+#         run: |
+#           ls -l /opt
+#           #dpkg-query -l
 
-      - name: try to free some space
-        run: |
-          sudo apt-get remove -y cabal* gfortran* ghc* dotnet* libmono* mono* libmono* php* \
-            clang* openjd* mongo* zulu*
-          #llvm*
-          sudo apt-get autoremove -y
-          sudo df -h
+#       - name: try to free some space
+#         run: |
+#           sudo apt-get remove -y cabal* gfortran* ghc* dotnet* libmono* mono* libmono* php* \
+#             clang* openjd* mongo* zulu*
+#           #llvm*
+#           sudo apt-get autoremove -y
+#           sudo df -h
 
       -
         name: create small fs for docker cache
@@ -106,7 +106,7 @@ jobs:
           echo -e "from alpine\n  run echo hello! \n \n" | tee dtest
           docker buildx build -f dtest -t dtest -t shtripok/rust-musl-builder:dtest-load --load .
           docker push shtripok/rust-musl-builder:dtest-load
-          docker buildx build -f dtest -t dtest -t shtripok/rust-musl-builder:dtest-push --load .
+          docker buildx build -f dtest -t dtest -t shtripok/rust-musl-builder:dtest-push --push .
 
           #cd docker/dev/
           #V=$VERSION docker buildx bake -f bake.hcl --push
