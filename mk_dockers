@@ -1,0 +1,50 @@
+#!/bin/bash -x
+# build containers for 3 platform, place in local docker 
+#  and upload to registry
+
+TAG='shtripok/musl-builder:1'
+# registry.gitlab.com/shtripok/rust-musl-builder:'
+PLATFORMS="amd64 arm64 armv7hf"
+MANIPART=""
+
+for P in $PLATFORMS; do
+	case "$P" in 
+		amd64) 
+			BUILDARG='--build-arg OPENSSL_TARGET=linux-x86_64 --build-arg LD_MUSL_ARCH=x86_64 --build-arg  TRIPLET=x86_64-linux-gnu --build-arg RUST_TARGET=x86_64-unknown-linux-musl'
+			BXPLATFORM='linux/amd64'
+			;;
+		arm64)
+			BUILDARG='--build-arg OPENSSL_TARGET=linux-aarch64 --build-arg LD_MUSL_ARCH=aarch64 --build-arg TRIPLET=aarch64-linux-gnu --build-arg RUST_TARGET=aarch64-unknown-linux-musl'
+			BXPLATFORM='linux/aarch64'
+			;;			
+		armv7hf)
+			BUILDARG='--build-arg OPENSSL_TARGET=linux-armv4 --build-arg LD_MUSL_ARCH=armhf --build-arg  TRIPLET=arm-linux-gnueabihf --build-arg RUST_TARGET=armv7-unknown-linux-musleabihf'
+			BXPLATFORM='linux/arm/v7'
+			;;
+		*) echo >&2 "unsupported architecture: ${TARGETARCH}"; exit 1 ;; 
+	esac;
+	
+	docker buildx build $BUILDARG --platform "$BXPLATFORM" \
+		-t rust4lemmy:${P} \
+		-t "${TAG}-${P}" \
+		--progress plain \
+		--load . && \
+		MANIPART+="${TAG}-${P} " && \
+		docker push "${TAG}-${P}"
+
+done
+wait 
+
+docker manifest create $TAG $MANIPART --amend
+docker manifest annotate --arch arm --variant v7 $TAG "${TAG}-armv7hf"
+docker manifest annotate --arch arm64 $TAG "${TAG}-aarch64"
+docker manifest push $TAG
+
+exit
+# build containers manualy on taret platforms without buildx:
+
+docker build --build-arg OPENSSL_TARGET=linux-x86_64 --build-arg LD_MUSL_ARCH=x86_64 --build-arg TRIPLET=x86_64-linux-gnu --build-arg RUST_TARGET=x86_64-unknown-linux-musl  -t rust4lemmy:amd64 -t shtripok/musl-builder:1-amd64 .
+
+docker build --build-arg OPENSSL_TARGET=linux-aarch64 --build-arg LD_MUSL_ARCH=aarch64 --build-arg TRIPLET=aarch64-linux-gnu --build-arg RUST_TARGET=aarch64-unknown-linux-musl -t rust4lemmy:arm64 -t shtripok/musl-builder:1-arm64 .
+
+docker build --build-arg OPENSSL_TARGET=linux-armv4 --build-arg LD_MUSL_ARCH=armhf --build-arg TRIPLET=arm-linux-gnueabihf --build-arg RUST_TARGET=armv7-unknown-linux-musleabihf -t rust4lemmy:armv7hf -t shtripok/musl-builder:1-armv7hf .
