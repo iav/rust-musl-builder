@@ -100,8 +100,8 @@ jobs:
           echo VERSION=$VERSION
 
           # test push to repo
-          echo -e "from alpine\n  run echo hello! \n \n" | tee dtest
-          docker buildx build -f dtest -t dtest -t shtripok/rust-musl-builder --push .
+          #echo -e "from alpine\n  run echo hello! \n \n" | tee dtest
+          #docker buildx build -f dtest -t dtest -t shtripok/rust-musl-builder --push .
           #docker push shtripok/rust-musl-builder
 
           #cd docker/dev/
@@ -114,9 +114,13 @@ jobs:
             --build-arg LD_MUSL_ARCH=x86_64 \
             --build-arg TRIPLET=x86_64-linux-gnu \
             --build-arg RUST_TARGET=x86_64-unknown-linux-musl \
-            --push \
+            #--push \
+            --load \
             --progress plain \
             --file Dockerfile .
+          
+          docker push $IMAGE_ID:$VERSION-amd64
+           
           df -h
 
           docker buildx build \
@@ -126,10 +130,13 @@ jobs:
             --build-arg LD_MUSL_ARCH=armhf \
             --build-arg TRIPLET=arm-linux-gnueabihf \
             --build-arg RUST_TARGET=armv7-unknown-linux-musleabihf \
-            --push \
+            #--push \
+            --load \
             --progress plain \
             --file Dockerfile .
-
+          
+          docker push $IMAGE_ID:$VERSION-armv7
+          
           docker buildx build \
             --platform linux/arm64 \
             --tag $IMAGE_ID:$VERSION-arm64 \
@@ -137,9 +144,11 @@ jobs:
             --build-arg LD_MUSL_ARCH=aarch64 \
             --build-arg TRIPLET=aarch64-linux-gnu \
             --build-arg RUST_TARGET=aarch64-unknown-linux-musl \
-            --push \
+            #--push \
+            --load \
             --file Dockerfile .
 
+          docker push $IMAGE_ID:$VERSION-arm64
           #df -h
           sudo free -h
           #docker buildx du
