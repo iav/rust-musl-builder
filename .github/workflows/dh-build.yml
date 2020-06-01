@@ -37,6 +37,7 @@ jobs:
           mkdir $HOME/.docker
           echo -e "{\n  \"experimental\": \"enabled\"\n}" | tee $HOME/.docker/config.json
           docker version
+
       - name: list packages
         run: |
           ls -l /opt
@@ -102,9 +103,10 @@ jobs:
           echo VERSION=$VERSION
 
           # test push to repo
-          #echo -e "from alpine\n  run echo hello! \n \n" | tee dtest
-          #docker buildx build -f dtest -t dtest -t shtripok/rust-musl-builder --push .
-          #docker push shtripok/rust-musl-builder
+          echo -e "from alpine\n  run echo hello! \n \n" | tee dtest
+          docker buildx build -f dtest -t dtest -t shtripok/rust-musl-builder:dtest-load --load .
+          docker push shtripok/rust-musl-builder:dtest-load
+          docker buildx build -f dtest -t dtest -t shtripok/rust-musl-builder:dtest-push --load .
 
           #cd docker/dev/
           #V=$VERSION docker buildx bake -f bake.hcl --push
