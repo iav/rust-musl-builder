@@ -105,9 +105,9 @@ jobs:
 
           # test push to repo
           echo -e "from alpine\n  run echo hello! \n \n" | tee dtest
-          docker buildx build -f dtest -t shtripok/rust-musl-builder:dtest-load --load .
-          docker push shtripok/rust-musl-builder:dtest-load
-          docker buildx build -f dtest -t shtripok/rust-musl-builder:dtest-push --output "type=image,push=true" .
+          docker buildx build -f dtest -t $IMAGE_ID:$VERSION-amd64dtest-load --load .
+          docker push $IMAGE_ID:$VERSION-amd64dtest-load
+          docker buildx build -f dtest -t $IMAGE_ID:$VERSION-amd64dtest-push --output "type=image,push=true" .
 
           #cd docker/dev/
           #V=$VERSION docker buildx bake -f bake.hcl --push
