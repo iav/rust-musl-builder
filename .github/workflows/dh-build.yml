@@ -151,8 +151,11 @@ jobs:
             --file Dockerfile .
 
           #docker push $IMAGE_ID:$VERSION-arm64
-          #df -h
+          echo df -h
+          sudo df -h
+          echo free -h
           sudo free -h
+          echo docker buildx du
           docker buildx du
 
           docker manifest create $IMAGE_ID:$VERSION \
