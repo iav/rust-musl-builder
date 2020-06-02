@@ -72,7 +72,7 @@ jobs:
           sudo mount -o defaults,suid /swapfile1 /var/lib/docker
           mount
           df -h
-
+          
           sudo systemctl start docker
 
       - name: Log into registry
@@ -93,6 +93,7 @@ jobs:
       -
         name: Run Buildx
         run: |
+          ls -la /usr/bin/binfmt.d/
           IMAGE_ID=$IMAGE_NAME
 
           # Change all uppercase to lowercase
