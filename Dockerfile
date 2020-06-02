@@ -116,6 +116,8 @@ ENV PATH=/home/rust/.cargo/bin:$MUSL_PREFIX/bin:/usr/local/sbin:/usr/local/bin:/
 #RUN git config --global credential.https://github.com.helper ghtoken
 
 # don't use sudo asworkaround to error 
+# sudo: effective uid is not 0, is /usr/bin/sudo on a file system with the 'nosuid'
+# option set or an NFS file system without root privileges?
 # on arm and aarch64 under qemu on some system
 USER root
 WORKDIR /tmp
@@ -217,9 +219,10 @@ ADD cargo-config.toml /home/rust/.cargo/config
 # toolchain, but that should be OK.
 #RUN cargo install -f cargo-audit && \
 #    rm -rf /home/rust/.cargo/registry/
+USER root
+RUN chown -R rust /home/rust
 
-RUN sudo chown -R rust /home/rust
-
+USER rust
 # Expect our source code to live in /home/rust/src.  We'll run the build as
 # user `rust`, which will be uid 10001, gid 10001 outside the container.
 WORKDIR /home/rust/src
