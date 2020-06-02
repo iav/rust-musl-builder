@@ -93,7 +93,7 @@ jobs:
       -
         name: Run Buildx
         run: |
-          ls -la /usr/bin/binfmt.d/
+          #ls -la /usr/bin/binfmt.d/
           IMAGE_ID=$IMAGE_NAME
 
           # Change all uppercase to lowercase
@@ -108,10 +108,10 @@ jobs:
           echo VERSION=$VERSION
 
           # test push to repo
-          echo -e "from alpine\n  run echo hello! \n \n" | tee dtest
-          docker buildx build -f dtest -t $IMAGE_ID:$VERSION-amd64dtest-load --load .
-          docker push $IMAGE_ID:$VERSION-amd64dtest-load
-          docker buildx build -f dtest -t $IMAGE_ID:$VERSION-amd64dtest-push --push .
+          #echo -e "from alpine\n  run echo hello! \n \n" | tee dtest
+          #docker buildx build -f dtest -t $IMAGE_ID:$VERSION-amd64dtest-load --load .
+          #docker push $IMAGE_ID:$VERSION-amd64dtest-load
+          #docker buildx build -f dtest -t $IMAGE_ID:$VERSION-amd64dtest-push --push .
 
           #cd docker/dev/
           #V=$VERSION docker buildx bake -f bake.hcl --push
@@ -123,7 +123,7 @@ jobs:
             --build-arg LD_MUSL_ARCH=x86_64 \
             --build-arg TRIPLET=x86_64-linux-gnu \
             --build-arg RUST_TARGET=x86_64-unknown-linux-musl \
-            --output "type=image,push=true" \
+            --push \
             --progress plain \
             --file Dockerfile .
           
@@ -131,6 +131,17 @@ jobs:
            
           df -h
 
+          docker buildx build \
+            --platform linux/arm64 \
+            --tag $IMAGE_ID:$VERSION-arm64 \
+            --build-arg OPENSSL_TARGET=linux-aarch64 \
+            --build-arg LD_MUSL_ARCH=aarch64 \
+            --build-arg TRIPLET=aarch64-linux-gnu \
+            --build-arg RUST_TARGET=aarch64-unknown-linux-musl \
+            --push \
+            --file Dockerfile .
+             
+             
           docker buildx build \
             --platform linux/arm/v7 \
             --tag $IMAGE_ID:$VERSION-armv7 \
@@ -144,15 +155,7 @@ jobs:
           
           #docker push $IMAGE_ID:$VERSION-armv7
           
-          docker buildx build \
-            --platform linux/arm64 \
-            --tag $IMAGE_ID:$VERSION-arm64 \
-            --build-arg OPENSSL_TARGET=linux-aarch64 \
-            --build-arg LD_MUSL_ARCH=aarch64 \
-            --build-arg TRIPLET=aarch64-linux-gnu \
-            --build-arg RUST_TARGET=aarch64-unknown-linux-musl \
-            --output "type=image,push=true" \
-            --file Dockerfile .
+
 
           #docker push $IMAGE_ID:$VERSION-arm64
           echo df -h
