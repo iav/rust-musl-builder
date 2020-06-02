@@ -119,7 +119,7 @@ jobs:
             --build-arg LD_MUSL_ARCH=x86_64 \
             --build-arg TRIPLET=x86_64-linux-gnu \
             --build-arg RUST_TARGET=x86_64-unknown-linux-musl \
-            --push \
+            --output "type=image,push=true" \
             --progress plain \
             --file Dockerfile .
           
@@ -134,7 +134,7 @@ jobs:
             --build-arg LD_MUSL_ARCH=armhf \
             --build-arg TRIPLET=arm-linux-gnueabihf \
             --build-arg RUST_TARGET=armv7-unknown-linux-musleabihf \
-            --push \
+            --output "type=image,push=true" \
             --progress plain \
             --file Dockerfile .
           
@@ -147,13 +147,13 @@ jobs:
             --build-arg LD_MUSL_ARCH=aarch64 \
             --build-arg TRIPLET=aarch64-linux-gnu \
             --build-arg RUST_TARGET=aarch64-unknown-linux-musl \
-            --load \
+            --output "type=image,push=true" \
             --file Dockerfile .
 
           #docker push $IMAGE_ID:$VERSION-arm64
           #df -h
           sudo free -h
-          #docker buildx du
+          docker buildx du
 
           docker manifest create $IMAGE_ID:$VERSION \
             $IMAGE_ID:$VERSION-amd64 \
