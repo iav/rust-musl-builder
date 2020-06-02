@@ -68,8 +68,9 @@ jobs:
           sudo free -h
 
           #sudo mount -t tmpfs -o size=10G tmpfs /var/lib/docker
-          sudo mount -t xfs /swapfile1 /var/lib/docker
+          sudo mount -t xfs -o suid /swapfile1 /var/lib/docker
           df -h
+          mount
           sudo systemctl start docker
 
       - name: Log into registry
@@ -107,7 +108,7 @@ jobs:
           echo -e "from alpine\n  run echo hello! \n \n" | tee dtest
           docker buildx build -f dtest -t $IMAGE_ID:$VERSION-amd64dtest-load --load .
           docker push $IMAGE_ID:$VERSION-amd64dtest-load
-          docker buildx build -f dtest -t $IMAGE_ID:$VERSION-amd64dtest-push --output "type=image,push=true" .
+          docker buildx build -f dtest -t $IMAGE_ID:$VERSION-amd64dtest-push --push .
 
           #cd docker/dev/
           #V=$VERSION docker buildx bake -f bake.hcl --push
