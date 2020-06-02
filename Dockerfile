@@ -115,6 +115,9 @@ ENV PATH=/home/rust/.cargo/bin:$MUSL_PREFIX/bin:/usr/local/sbin:/usr/local/bin:/
 #ADD git-credential-ghtoken /usr/local/bin
 #RUN git config --global credential.https://github.com.helper ghtoken
 
+# don't use sudo asworkaround to error 
+# on arm and aarch64 under qemu on some system
+USER root
 WORKDIR /tmp
 RUN echo "Building zlib" && \
     cd /tmp && \
@@ -195,6 +198,7 @@ ENV TARGET=$RUST_TARGET \
 # interact with the user or fool around with TTYs.  We also set the default
 # `--target` to musl so that our users don't need to keep overriding it
 # manually.
+USER rust
 RUN curl https://sh.rustup.rs -sSf | \
     sh -s -- -y --default-toolchain $TOOLCHAIN && \
 	rustup target add $RUST_TARGET
