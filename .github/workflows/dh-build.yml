@@ -115,18 +115,18 @@ jobs:
 
           #cd docker/dev/
           #V=$VERSION docker buildx bake -f bake.hcl --push
-          rem >
-              docker buildx build \
-                --platform linux/amd64 \
-                --tag $IMAGE_ID:$VERSION-amd64 \
-                --tag $IMAGE_ID:$VERSION \
-                --build-arg OPENSSL_TARGET=linux-x86_64 \
-                --build-arg LD_MUSL_ARCH=x86_64 \
-                --build-arg TRIPLET=x86_64-linux-gnu \
-                --build-arg RUST_TARGET=x86_64-unknown-linux-musl \
-                --push \
-                --progress plain \
-                --file Dockerfile .
+          
+          echo docker buildx build \
+           --platform linux/amd64 \
+            --tag $IMAGE_ID:$VERSION-amd64 \
+            --tag $IMAGE_ID:$VERSION \
+            --build-arg OPENSSL_TARGET=linux-x86_64 \
+            --build-arg LD_MUSL_ARCH=x86_64 \
+            --build-arg TRIPLET=x86_64-linux-gnu \
+            --build-arg RUST_TARGET=x86_64-unknown-linux-musl \
+            --push \
+            --progress plain \
+            --file Dockerfile .
           
           #docker push $IMAGE_ID:$VERSION-amd64
            
