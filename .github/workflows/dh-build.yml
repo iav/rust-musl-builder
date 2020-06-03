@@ -12,9 +12,7 @@ on:
 env:
   # TODO: Change variable to your image's name.
    IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
-   #IMAGE_NAME: shtripok/rust-musl-builder
    DOCKER_REGISTRY_USERNAME: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
-   #DOCKER_REGISTRY_USERNAME: shtripok
   # DOCKERHUB_TOKEN should be set in "secrets" property of github repository
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -45,12 +43,12 @@ jobs:
 
       - name: try to free some space
         run: |
-          sudo apt-get remove -y cabal* gfortran* ghc* dotnet* libmono* mono* libmono* php* \
-            clang* openjd* mongo* zulu*
+#          sudo apt-get remove -y cabal* gfortran* ghc* dotnet* libmono* mono* libmono* php* \
+#           clang* openjd* mongo* zulu*
           #llvm*
-          sudo apt-get autoremove -y
-          dpkg-query -l
-          sudo df -h
+#          sudo apt-get autoremove -y
+#          dpkg-query -l
+#          sudo df -h
           sudo apt-get install -y qemu-user-static
           
           cat /proc/sys/fs/binfmt_misc/qemu-arm
@@ -99,7 +97,6 @@ jobs:
       -
         name: Run Buildx
         run: |
-          #ls -la /usr/bin/binfmt.d/
           IMAGE_ID=$IMAGE_NAME
 
           # Change all uppercase to lowercase
@@ -115,7 +112,28 @@ jobs:
 
           #cd docker/dev/
           #V=$VERSION docker buildx bake -f bake.hcl --push
-          
+
+          docker buildx build \
+            --platform linux/arm/v7 \
+            --tag $IMAGE_ID:$VERSION-armv7 \
+            --build-arg OPENSSL_TARGET=linux-armv4 \
+            --build-arg LD_MUSL_ARCH=armhf \
+            --build-arg TRIPLET=arm-linux-gnueabihf \
+            --build-arg RUST_TARGET=armv7-unknown-linux-musleabihf \
+            --output "type=image,push=true" \
+            --progress plain \
+            --file Dockerfile .
+
+          docker buildx build \
+            --platform linux/arm64 \
+            --tag $IMAGE_ID:$VERSION-arm64 \
+            --build-arg OPENSSL_TARGET=linux-aarch64 \
+            --build-arg LD_MUSL_ARCH=aarch64 \
+            --build-arg TRIPLET=aarch64-linux-gnu \
+            --build-arg RUST_TARGET=aarch64-unknown-linux-musl \
+            --push \
+            --file Dockerfile .
+
           echo docker buildx build \
            --platform linux/amd64 \
             --tag $IMAGE_ID:$VERSION-amd64 \
@@ -132,28 +150,7 @@ jobs:
            
           df -h
 
-          docker buildx build \
-            --platform linux/arm64 \
-            --tag $IMAGE_ID:$VERSION-arm64 \
-            --build-arg OPENSSL_TARGET=linux-aarch64 \
-            --build-arg LD_MUSL_ARCH=aarch64 \
-            --build-arg TRIPLET=aarch64-linux-gnu \
-            --build-arg RUST_TARGET=aarch64-unknown-linux-musl \
-            --push \
-            --file Dockerfile .
-             
-             
-          docker buildx build \
-            --platform linux/arm/v7 \
-            --tag $IMAGE_ID:$VERSION-armv7 \
-            --build-arg OPENSSL_TARGET=linux-armv4 \
-            --build-arg LD_MUSL_ARCH=armhf \
-            --build-arg TRIPLET=arm-linux-gnueabihf \
-            --build-arg RUST_TARGET=armv7-unknown-linux-musleabihf \
-            --output "type=image,push=true" \
-            --progress plain \
-            --file Dockerfile .
-          
+
           #docker push $IMAGE_ID:$VERSION-armv7
           
 
