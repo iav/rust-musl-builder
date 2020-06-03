@@ -78,7 +78,7 @@ RUN    apt-get update && apt-get upgrade -y && \
         musl-dev \
         musl-tools \
         libpq-dev \
-#        libsqlite-dev \
+        libsqlite-dev \
         libssl-dev \
         linux-libc-dev \
 #       pkg-config \
