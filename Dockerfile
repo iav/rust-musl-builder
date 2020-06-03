@@ -71,7 +71,7 @@ RUN    apt-get update && apt-get upgrade -y && \
     apt-get install -y \
         build-essential \
         cmake \
-        curl \
+#        curl \
         file mc \
         git \
         musl-dev \
@@ -147,7 +147,7 @@ RUN echo "Building OpenSSL" && \
 #   && \
 
 WORKDIR /tmp
-RUN  curl -LO "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" && \
+RUN wget "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" && \
     tar xvzf "openssl-$OPENSSL_VERSION.tar.gz" && \
     echo $OPENSSL_TARGET && cd "openssl-$OPENSSL_VERSION" && \
     env CC="musl-gcc -fPIE -pie" ./Configure  no-zlib -fPIC no-afalgeng \
@@ -164,7 +164,7 @@ RUN  curl -LO "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" &
 
 RUN echo "Building libpq" && \
     cd /tmp && \
-    curl -LO "https://ftp.postgresql.org/pub/source/v$POSTGRESQL_VERSION/postgresql-$POSTGRESQL_VERSION.tar.gz" && \
+    wget "https://ftp.postgresql.org/pub/source/v$POSTGRESQL_VERSION/postgresql-$POSTGRESQL_VERSION.tar.gz" && \
     tar xzf "postgresql-$POSTGRESQL_VERSION.tar.gz" && \
     cd "postgresql-$POSTGRESQL_VERSION" && \
     CC="musl-gcc -fPIE -pie" CPPFLAGS=-I$MUSL_PREFIX/include LDFLAGS=-L$MUSL_PREFIX/lib ./configure --with-openssl --without-readline --prefix=$MUSL_PREFIX && \
