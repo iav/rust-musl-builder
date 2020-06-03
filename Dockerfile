@@ -67,8 +67,8 @@ ARG POSTGRESQL_VERSION=11.8
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN    apt-get update && apt-get upgrade -y && \
-    apt-get install -y \
+RUN   apt-get update && apt-get upgrade -y && \
+      apt-get install -y \
         build-essential \
 	ca-certificates \
         cmake \
@@ -111,7 +111,12 @@ RUN mkdir -p /home/rust/libs /home/rust/src
 # Set up our path with all our binary directories, including those for the
 # musl-gcc toolchain and for our Rust toolchain.
 ENV PATH=/home/rust/.cargo/bin:$MUSL_PREFIX/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-
+USER rust
+# FIXME: --insecure added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
+RUN curl https://sh.rustup.rs -sSf | \
+    sh -s -- -y --default-toolchain $TOOLCHAIN && \
+	rustup target add $RUST_TARGET
+	
 # Set up a `git credentials` helper for using GH_USER and GH_TOKEN to access
 # private repositories if desired.
 #ADD git-credential-ghtoken /usr/local/bin
@@ -148,6 +153,7 @@ RUN echo "Building OpenSSL" && \
 #   && \
 
 WORKDIR /tmp
+# FIXME: --insecure added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
 RUN wget --no-check-certificate "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" && \
     tar xvzf "openssl-$OPENSSL_VERSION.tar.gz" && \
     echo $OPENSSL_TARGET && cd "openssl-$OPENSSL_VERSION" && \
@@ -162,7 +168,7 @@ RUN wget --no-check-certificate "https://www.openssl.org/source/openssl-$OPENSSL
     rm -r /tmp/*
 
 
-
+# FIXME: --insecure added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
 RUN echo "Building libpq" && \
     cd /tmp && \
     wget --no-check-certificate "https://ftp.postgresql.org/pub/source/v$POSTGRESQL_VERSION/postgresql-$POSTGRESQL_VERSION.tar.gz" && \
@@ -203,6 +209,7 @@ ENV TARGET=$RUST_TARGET \
 # `--target` to musl so that our users don't need to keep overriding it
 # manually.
 USER rust
+# FIXME: --insecure added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
 RUN curl https://sh.rustup.rs -sSf | \
     sh -s -- -y --default-toolchain $TOOLCHAIN && \
 	rustup target add $RUST_TARGET
