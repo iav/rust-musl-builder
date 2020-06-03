@@ -92,7 +92,7 @@ RUN    apt-get update && apt-get upgrade -y && \
 #        && \
 #    apt-get clean && rm -rf /var/lib/apt/lists/* && \
 RUN    useradd rust --user-group --create-home --shell /bin/bash --groups sudo -u $RUSTUSERID
-
+RUN date
 
 # Static linking for C++ code
 RUN sudo ln -s "/usr/bin/g++" "/usr/bin/musl-g++"
