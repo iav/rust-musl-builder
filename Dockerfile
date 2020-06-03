@@ -112,17 +112,13 @@ RUN mkdir -p /home/rust/libs /home/rust/src
 # musl-gcc toolchain and for our Rust toolchain.
 ENV PATH=/home/rust/.cargo/bin:$MUSL_PREFIX/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 USER rust
-# FIXME: --insecure added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
-RUN curl --insecure https://sh.rustup.rs -sSf | \
-    sh -s -- -y --default-toolchain $TOOLCHAIN && \
-	rustup target add $RUST_TARGET
 	
 # Set up a `git credentials` helper for using GH_USER and GH_TOKEN to access
 # private repositories if desired.
 #ADD git-credential-ghtoken /usr/local/bin
 #RUN git config --global credential.https://github.com.helper ghtoken
 
-# don't use sudo asworkaround to error 
+# FIXME: don't use sudo asworkaround to error 
 # sudo: effective uid is not 0, is /usr/bin/sudo on a file system with the 'nosuid'
 # option set or an NFS file system without root privileges?
 # on arm and aarch64 under qemu on some system
@@ -153,8 +149,8 @@ RUN echo "Building OpenSSL" && \
 #   && \
 
 WORKDIR /tmp
-# FIXME: --insecure added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
-RUN wget --no-check-certificate "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" && \
+# FIXME: --no-check-certificate added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
+RUN wget "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" && \
     tar xvzf "openssl-$OPENSSL_VERSION.tar.gz" && \
     echo $OPENSSL_TARGET && cd "openssl-$OPENSSL_VERSION" && \
     env CC="musl-gcc -fPIE -pie" ./Configure  no-zlib -fPIC no-afalgeng \
@@ -168,10 +164,10 @@ RUN wget --no-check-certificate "https://www.openssl.org/source/openssl-$OPENSSL
     rm -r /tmp/*
 
 
-# FIXME: --insecure added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
+# FIXME: --no-check-certificate added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
 RUN echo "Building libpq" && \
     cd /tmp && \
-    wget --no-check-certificate "https://ftp.postgresql.org/pub/source/v$POSTGRESQL_VERSION/postgresql-$POSTGRESQL_VERSION.tar.gz" && \
+    wget "https://ftp.postgresql.org/pub/source/v$POSTGRESQL_VERSION/postgresql-$POSTGRESQL_VERSION.tar.gz" && \
     tar xzf "postgresql-$POSTGRESQL_VERSION.tar.gz" && \
     cd "postgresql-$POSTGRESQL_VERSION" && \
     CC="musl-gcc -fPIE -pie" CPPFLAGS=-I$MUSL_PREFIX/include LDFLAGS=-L$MUSL_PREFIX/lib ./configure --with-openssl --without-readline --prefix=$MUSL_PREFIX && \
@@ -228,6 +224,10 @@ ADD cargo-config.toml /home/rust/.cargo/config
 # toolchain, but that should be OK.
 #RUN cargo install -f cargo-audit && \
 #    rm -rf /home/rust/.cargo/registry/
+
+# FIXME: workaround for error on arm32 image under qemm
+# sudo: effective uid is not 0, is /usr/bin/sudo on a file system with 
+# the 'nosuid' option set or an NFS file system without root privileges?
 USER root
 RUN chown -R rust /home/rust
 
