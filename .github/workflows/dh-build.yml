@@ -41,18 +41,18 @@ jobs:
 #           ls -l /opt
 #           #dpkg-query -l
 
-      - name: try to free some space
-        run: |
+#      - name: try to free some space
+#        run: |
 #          sudo apt-get remove -y cabal* gfortran* ghc* dotnet* libmono* mono* libmono* php* \
 #           clang* openjd* mongo* zulu*
-          #llvm*
+#            #llvm*
 #          sudo apt-get autoremove -y
 #          dpkg-query -l
 #          sudo df -h
-          sudo apt-get install -y qemu-user-static
+#          sudo apt-get install -y qemu-user-static
           
-          cat /proc/sys/fs/binfmt_misc/qemu-arm
-          cat /proc/sys/fs/binfmt_misc/qemu-aarch64
+#          cat /proc/sys/fs/binfmt_misc/qemu-arm
+#          cat /proc/sys/fs/binfmt_misc/qemu-aarch64
           
           
 
