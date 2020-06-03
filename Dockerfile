@@ -72,7 +72,7 @@ RUN    apt-get update && apt-get upgrade -y && \
         build-essential \
 	ca-certificates \
         cmake \
-#        curl \
+        curl \
         file mc \
         git \
         musl-dev \
