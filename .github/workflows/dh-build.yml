@@ -113,7 +113,7 @@ jobs:
           #cd docker/dev/
           #V=$VERSION docker buildx bake -f bake.hcl --push
 
-          docker buildx build \
+          echo docker buildx build \
             --platform linux/arm/v7 \
             --tag $IMAGE_ID:$VERSION-armv7 \
             --build-arg OPENSSL_TARGET=linux-armv4 \
@@ -165,10 +165,12 @@ jobs:
 
           docker manifest create $IMAGE_ID:$VERSION \
             $IMAGE_ID:$VERSION-amd64 \
-            $IMAGE_ID:$VERSION-arm64 \
-            $IMAGE_ID:$VERSION-armv7
-          docker manifest annotate $IMAGE_ID:$VERSION $IMAGE_ID:$VERSION-armv7 \
-            --os=linux --arch=arm --variant=v7
+            $IMAGE_ID:$VERSION-arm64 
+
+          #echo $IMAGE_ID:$VERSION-armv7
+
+          #docker manifest annotate $IMAGE_ID:$VERSION $IMAGE_ID:$VERSION-armv7 \
+          #  --os=linux --arch=arm --variant=v7
           docker manifest annotate $IMAGE_ID:$VERSION $IMAGE_ID:$VERSION-arm64 \
             --os=linux --arch=arm64
           docker manifest inspect $IMAGE_ID:$VERSION
