@@ -134,7 +134,7 @@ jobs:
             --push \
             --file Dockerfile .
 
-          echo docker buildx build \
+          docker buildx build \
            --platform linux/amd64 \
             --tag $IMAGE_ID:$VERSION-amd64 \
             --tag $IMAGE_ID:$VERSION \
