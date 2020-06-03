@@ -83,6 +83,7 @@ RUN    apt-get update && apt-get upgrade -y && \
 #       pkg-config \
         pkgconf \
         sudo \
+	wget \
         xutils-dev 
 #       gcc-multilib
 #        gcc-multilib-arm-linux-gnueabihf \
@@ -124,7 +125,7 @@ WORKDIR /tmp
 RUN echo "Building zlib" && \
     cd /tmp && \
     ZLIB_VERSION=1.2.11 && \
-    curl -LO "http://zlib.net/zlib-$ZLIB_VERSION.tar.gz" && \
+    wget "http://zlib.net/zlib-$ZLIB_VERSION.tar.gz" && \
     tar xzf "zlib-$ZLIB_VERSION.tar.gz" && cd "zlib-$ZLIB_VERSION" && \
     CC="musl-gcc -fPIE -pie" ./configure --static --prefix=$MUSL_PREFIX && \
     make && sudo make install    && \
