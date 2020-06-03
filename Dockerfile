@@ -113,7 +113,7 @@ RUN mkdir -p /home/rust/libs /home/rust/src
 ENV PATH=/home/rust/.cargo/bin:$MUSL_PREFIX/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 USER rust
 # FIXME: --insecure added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
-RUN curl https://sh.rustup.rs -sSf | \
+RUN curl --insecure https://sh.rustup.rs -sSf | \
     sh -s -- -y --default-toolchain $TOOLCHAIN && \
 	rustup target add $RUST_TARGET
 	
