@@ -50,25 +50,25 @@ jobs:
 #          dpkg-query -l
 #          sudo df -h
 #          sudo apt-get install -y qemu-user-static
-          
+
 #          cat /proc/sys/fs/binfmt_misc/qemu-arm
 #          cat /proc/sys/fs/binfmt_misc/qemu-aarch64
-          
-          
+
+
 
 #       -
 #         name: create small fs for docker cache
 #         run: |
-          
+
 #           sudo systemctl stop docker
 #           sudo rm -rf /var/lib/docker/*
 #           #apt list --installed
 #           #sudo dd if=/dev/zero of=/swapfile1 bs=1M count=24K
 #           sudo dd if=/dev/zero of=/swapfile1 bs=1M count=14K
 #           sudo chmod 600 /swapfile1
-          
+
 #           sudo mkfs.ext4 /swapfile1
-          
+
 #           #sudo swapon --show
 #           sudo free -h
 
@@ -76,7 +76,7 @@ jobs:
 #           sudo mount -o defaults,suid /swapfile1 /var/lib/docker
 #           mount
 #           df -h
-          
+
 #           sudo systemctl start docker
 
       - name: Log into registry
@@ -109,6 +109,8 @@ jobs:
           [ "$VERSION" == "master" ] && VERSION=latest
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
+		  echo github.ref="${{ github.ref }}"
+		  echo ${{ steps.buildx.outputs.platforms }}
 
           #cd docker/dev/
           #V=$VERSION docker buildx bake -f bake.hcl --push
@@ -138,6 +140,7 @@ jobs:
            --platform linux/amd64 \
             --tag $IMAGE_ID:$VERSION-amd64 \
             --tag $IMAGE_ID:$VERSION \
+			--build-arg OPENSSL_VERSION=1.1.1g
             --build-arg OPENSSL_TARGET=linux-x86_64 \
             --build-arg LD_MUSL_ARCH=x86_64 \
             --build-arg TRIPLET=x86_64-linux-gnu \
@@ -145,14 +148,14 @@ jobs:
             --push \
             --progress plain \
             --file Dockerfile .
-          
+
           #docker push $IMAGE_ID:$VERSION-amd64
-           
+
           df -h
 
 
           #docker push $IMAGE_ID:$VERSION-armv7
-          
+
 
 
           #docker push $IMAGE_ID:$VERSION-arm64
@@ -165,7 +168,7 @@ jobs:
 
           docker manifest create $IMAGE_ID:$VERSION \
             $IMAGE_ID:$VERSION-amd64 \
-            $IMAGE_ID:$VERSION-arm64 
+            $IMAGE_ID:$VERSION-arm64
 
           #echo $IMAGE_ID:$VERSION-armv7
 
