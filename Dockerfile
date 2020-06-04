@@ -6,8 +6,8 @@
 # Use Ubuntu 18.04 LTS as our base image.
 #FROM ubuntu:18.04
 #FROM ubuntu:20.04
-FROM ubuntu:19.10
-#FROM debian:10-slim
+#FROM ubuntu:19.10
+FROM debian:10-slim
 
 
 ARG TARGETPLATFORM
@@ -84,7 +84,7 @@ RUN   apt-get update && apt-get upgrade -y && \
 #       pkg-config \
         pkgconf \
         sudo \
-	wget \
+#	wget \
         xutils-dev 
 #       gcc-multilib
 #        gcc-multilib-arm-linux-gnueabihf \
@@ -127,7 +127,7 @@ WORKDIR /tmp
 RUN echo "Building zlib" && \
     cd /tmp && \
     ZLIB_VERSION=1.2.11 && \
-    wget "http://zlib.net/zlib-$ZLIB_VERSION.tar.gz" && \
+    curl -fLO "http://zlib.net/zlib-$ZLIB_VERSION.tar.gz" && \
     tar xzf "zlib-$ZLIB_VERSION.tar.gz" && cd "zlib-$ZLIB_VERSION" && \
     CC="musl-gcc -fPIE -pie" ./configure --static --prefix=$MUSL_PREFIX && \
     make && sudo make install    && \
@@ -150,7 +150,7 @@ RUN echo "Building OpenSSL" && \
 
 WORKDIR /tmp
 # FIXME: --no-check-certificate added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
-RUN wget "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" && \
+RUN curl -fLO "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" && \
     tar xvzf "openssl-$OPENSSL_VERSION.tar.gz" && \
     echo $OPENSSL_TARGET && cd "openssl-$OPENSSL_VERSION" && \
     env CC="musl-gcc -fPIE -pie" ./Configure  no-zlib -fPIC no-afalgeng \
@@ -167,7 +167,7 @@ RUN wget "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" && \
 # FIXME: --no-check-certificate added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
 RUN echo "Building libpq" && \
     cd /tmp && \
-    wget "https://ftp.postgresql.org/pub/source/v$POSTGRESQL_VERSION/postgresql-$POSTGRESQL_VERSION.tar.gz" && \
+    curl -fLO "https://ftp.postgresql.org/pub/source/v$POSTGRESQL_VERSION/postgresql-$POSTGRESQL_VERSION.tar.gz" && \
     tar xzf "postgresql-$POSTGRESQL_VERSION.tar.gz" && \
     cd "postgresql-$POSTGRESQL_VERSION" && \
     CC="musl-gcc -fPIE -pie" CPPFLAGS=-I$MUSL_PREFIX/include LDFLAGS=-L$MUSL_PREFIX/lib ./configure --with-openssl --without-readline --prefix=$MUSL_PREFIX && \

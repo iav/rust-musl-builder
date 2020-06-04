@@ -2,7 +2,7 @@
 # build containers for 3 platform, place in local docker 
 #  and upload to registry
 
-TAG='shtripok/musl-builder:1'
+TAG='shtripok/rust-musl-builder:1'
 # registry.gitlab.com/shtripok/rust-musl-builder:'
 PLATFORMS="amd64 arm64 armv7hf"
 MANIPART=""
@@ -33,7 +33,7 @@ for P in $PLATFORMS; do
 		docker push "${TAG}-${P}"
 
 done
-wait 
+#wait
 
 docker manifest create $TAG $MANIPART --amend
 docker manifest annotate --arch arm --variant v7 $TAG "${TAG}-armv7hf"
