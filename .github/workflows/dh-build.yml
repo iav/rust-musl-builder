@@ -115,7 +115,7 @@ jobs:
           #cd docker/dev/
           #V=$VERSION docker buildx bake -f bake.hcl --push
 
-          echo docker buildx build \
+          docker buildx build \
             --platform linux/arm/v7 \
             --tag $IMAGE_ID:$VERSION-armv7 \
             --build-arg OPENSSL_TARGET=linux-armv4 \
@@ -126,7 +126,7 @@ jobs:
             --progress plain \
             --file Dockerfile .
 
-          docker buildx build \
+          echo docker buildx build \
             --platform linux/arm64 \
             --tag $IMAGE_ID:$VERSION-arm64 \
             --build-arg OPENSSL_TARGET=linux-aarch64 \
@@ -136,7 +136,7 @@ jobs:
             --push \
             --file Dockerfile .
 
-          docker buildx build \
+          echo docker buildx build \
             --platform linux/amd64 \
             --tag $IMAGE_ID:$VERSION-amd64 \
             --tag $IMAGE_ID:$VERSION \
@@ -166,18 +166,18 @@ jobs:
           echo docker buildx du
           docker buildx du
 
-          docker manifest create $IMAGE_ID:$VERSION \
-            $IMAGE_ID:$VERSION-amd64 \
-            $IMAGE_ID:$VERSION-arm64
+          #docker manifest create $IMAGE_ID:$VERSION \
+          #  $IMAGE_ID:$VERSION-amd64 \
+          #  $IMAGE_ID:$VERSION-arm64
 
           #echo $IMAGE_ID:$VERSION-armv7
 
           #docker manifest annotate $IMAGE_ID:$VERSION $IMAGE_ID:$VERSION-armv7 \
           #  --os=linux --arch=arm --variant=v7
-          docker manifest annotate $IMAGE_ID:$VERSION $IMAGE_ID:$VERSION-arm64 \
-            --os=linux --arch=arm64
-          docker manifest inspect $IMAGE_ID:$VERSION
-          docker manifest push $IMAGE_ID:$VERSION
+          #docker manifest annotate $IMAGE_ID:$VERSION $IMAGE_ID:$VERSION-arm64 \
+          #  --os=linux --arch=arm64
+          #docker manifest inspect $IMAGE_ID:$VERSION
+          #docker manifest push $IMAGE_ID:$VERSION
       -
         name: Post-build space check
         run: sudo df -h
