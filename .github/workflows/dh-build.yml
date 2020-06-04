@@ -140,7 +140,7 @@ jobs:
             --platform linux/amd64 \
             --tag $IMAGE_ID:$VERSION-amd64 \
             --tag $IMAGE_ID:$VERSION \
-            --build-arg OPENSSL_VERSION=1.1.1g
+            --build-arg OPENSSL_VERSION=1.1.1g \
             --build-arg OPENSSL_TARGET=linux-x86_64 \
             --build-arg LD_MUSL_ARCH=x86_64 \
             --build-arg TRIPLET=x86_64-linux-gnu \
