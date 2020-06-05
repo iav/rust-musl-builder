@@ -5,9 +5,9 @@
 
 
 #ARG BASE_IMAGE=ubuntu:18.04
-#ARG BASE_IMAGE=ubuntu:20.04
+ARG BASE_IMAGE=ubuntu:20.04
 #ARG BASE_IMAGE=ubuntu:19.10
-ARG BASE_IMAGE=debian:10-slim
+#ARG BASE_IMAGE=debian:10-slim
 
 FROM $BASE_IMAGE as builder
 
@@ -71,7 +71,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN   apt-get update && apt-get upgrade -y && \
       apt-get install -y \
         build-essential \
-	ca-certificates \
+        ca-certificates \
         cmake \
         curl \
         file mc \
@@ -85,7 +85,7 @@ RUN   apt-get update && apt-get upgrade -y && \
 #       pkg-config \
         pkgconf \
         sudo \
-#	wget \
+#   wget \
         xutils-dev 
 #       gcc-multilib
 #        gcc-multilib-arm-linux-gnueabihf \
@@ -112,8 +112,8 @@ RUN mkdir -p /home/rust/libs /home/rust/src
 # Set up our path with all our binary directories, including those for the
 # musl-gcc toolchain and for our Rust toolchain.
 ENV PATH=/home/rust/.cargo/bin:$MUSL_PREFIX/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-USER rust
-	
+#USER rust
+    
 # Set up a `git credentials` helper for using GH_USER and GH_TOKEN to access
 # private repositories if desired.
 #ADD git-credential-ghtoken /usr/local/bin
@@ -209,7 +209,7 @@ USER rust
 # FIXME: --insecure added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
 RUN curl https://sh.rustup.rs -sSf | \
     sh -s -- -y --default-toolchain $TOOLCHAIN && \
-	rustup target add $RUST_TARGET
+    rustup target add $RUST_TARGET
 #    rustup target add x86_64-unknown-linux-musl && \
 #    rustup target add armv7-unknown-linux-musleabihf
 #    rustup target add aarch64-unknown-linux-musl

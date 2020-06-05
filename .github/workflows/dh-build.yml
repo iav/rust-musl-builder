@@ -56,28 +56,28 @@ jobs:
 
 
 
-#       -
-#         name: create small fs for docker cache
-#         run: |
+      -
+        name: create small fs for docker cache
+        run: |
 
-#           sudo systemctl stop docker
-#           sudo rm -rf /var/lib/docker/*
-#           #apt list --installed
-#           #sudo dd if=/dev/zero of=/swapfile1 bs=1M count=24K
-#           sudo dd if=/dev/zero of=/swapfile1 bs=1M count=14K
-#           sudo chmod 600 /swapfile1
+          sudo systemctl stop docker
+          sudo rm -rf /var/lib/docker/*
 
-#           sudo mkfs.ext4 /swapfile1
+          #sudo dd if=/dev/zero of=/swapfile1 bs=1M count=24K
+          sudo dd if=/dev/zero of=/swapfile1 bs=1M count=14K
+          sudo chmod 600 /swapfile1
 
-#           #sudo swapon --show
-#           sudo free -h
+          sudo mkfs.xfs /swapfile1
 
-#           #sudo mount -t tmpfs -o size=10G tmpfs /var/lib/docker
-#           sudo mount -o defaults,suid /swapfile1 /var/lib/docker
-#           mount
-#           df -h
+          #sudo swapon --show
+          #sudo free -h
 
-#           sudo systemctl start docker
+          #sudo mount -t tmpfs -o size=10G tmpfs /var/lib/docker
+          sudo mount -o defaults,suid /swapfile1 /var/lib/docker
+          mount
+          df -h
+
+          sudo systemctl start docker
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u $DOCKER_REGISTRY_USERNAME --password-stdin
@@ -122,7 +122,7 @@ jobs:
             --build-arg LD_MUSL_ARCH=armhf \
             --build-arg TRIPLET=arm-linux-gnueabihf \
             --build-arg RUST_TARGET=armv7-unknown-linux-musleabihf \
-            --build-arg BASE_IMAGE=ubuntu:18.04 \
+            --build-arg BASE_IMAGE=ubuntu:20.04 \
             --output "type=image,push=true" \
             --progress plain \
             --file Dockerfile .
@@ -150,22 +150,11 @@ jobs:
             --progress plain \
             --file Dockerfile .
 
-          #docker push $IMAGE_ID:$VERSION-amd64
 
-          df -h
-
-
-          #docker push $IMAGE_ID:$VERSION-armv7
-
-
-
-          #docker push $IMAGE_ID:$VERSION-arm64
-          echo df -h
+          echo df -h -----------------------------------
           sudo df -h
-          echo free -h
+          echo free -h ------------------------------------
           sudo free -h
-          echo docker buildx du
-          docker buildx du
 
           docker manifest create $IMAGE_ID:$VERSION \
             $IMAGE_ID:$VERSION-amd64 \
