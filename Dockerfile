@@ -4,8 +4,8 @@
 # arm64) --build-arg OPENSSL_TARGET=linux-aarch64 --build-arg LD_MUSL_ARCH=aarch64 --build-arg TRIPLET=aarch64-linux-gnu --build-arg RUST_TARGET=aarch64-unknown-linux-musl
 
 
-#ARG BASE_IMAGE=ubuntu:18.04
-ARG BASE_IMAGE=ubuntu:20.04
+ARG BASE_IMAGE=ubuntu:18.04
+#ARG BASE_IMAGE=ubuntu:20.04
 #ARG BASE_IMAGE=ubuntu:19.10
 #ARG BASE_IMAGE=debian:10-slim
 
