@@ -74,7 +74,8 @@ RUN   apt-get update && apt-get upgrade -y && \
         ca-certificates \
         cmake \
         curl \
-        file mc \
+        file \
+#        mc \
         git \
         musl-dev \
         musl-tools \
@@ -86,14 +87,14 @@ RUN   apt-get update && apt-get upgrade -y && \
         pkgconf \
         sudo \
 #   wget \
-        xutils-dev 
+        xutils-dev \
 #       gcc-multilib
 #        gcc-multilib-arm-linux-gnueabihf \
 #        gcc-arm-linux-gnueabihf
-#        && \
-#    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+        && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* 
+    
 RUN    useradd rust --user-group --create-home --shell /bin/bash --groups sudo -u $RUSTUSERID
-RUN date
 
 # Static linking for C++ code
 RUN sudo ln -s "/usr/bin/g++" "/usr/bin/musl-g++"
@@ -112,18 +113,12 @@ RUN mkdir -p /home/rust/libs /home/rust/src
 # Set up our path with all our binary directories, including those for the
 # musl-gcc toolchain and for our Rust toolchain.
 ENV PATH=/home/rust/.cargo/bin:$MUSL_PREFIX/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-#USER rust
     
 # Set up a `git credentials` helper for using GH_USER and GH_TOKEN to access
 # private repositories if desired.
 #ADD git-credential-ghtoken /usr/local/bin
 #RUN git config --global credential.https://github.com.helper ghtoken
 
-# FIXME: don't use sudo asworkaround to error 
-# sudo: effective uid is not 0, is /usr/bin/sudo on a file system with the 'nosuid'
-# option set or an NFS file system without root privileges?
-# on arm and aarch64 under qemu on some system
-USER root
 WORKDIR /tmp
 RUN echo "Building zlib" && \
     cd /tmp && \
@@ -205,8 +200,6 @@ ENV TARGET=$RUST_TARGET \
 # interact with the user or fool around with TTYs.  We also set the default
 # `--target` to musl so that our users don't need to keep overriding it
 # manually.
-USER rust
-# FIXME: --insecure added to workaround ssl error on docker in buildx for arm32 on github builder 20200703
 RUN curl https://sh.rustup.rs -sSf | \
     sh -s -- -y --default-toolchain $TOOLCHAIN && \
     rustup target add $RUST_TARGET
@@ -226,13 +219,8 @@ ADD cargo-config.toml /home/rust/.cargo/config
 #RUN cargo install -f cargo-audit && \
 #    rm -rf /home/rust/.cargo/registry/
 
-# FIXME: workaround for error on arm32 image under qemm
-# sudo: effective uid is not 0, is /usr/bin/sudo on a file system with 
-# the 'nosuid' option set or an NFS file system without root privileges?
-USER root
-RUN chown -R rust /home/rust
+RUN sudo chown -R rust /home/rust
 
-USER rust
 # Expect our source code to live in /home/rust/src.  We'll run the build as
 # user `rust`, which will be uid 10001, gid 10001 outside the container.
 WORKDIR /home/rust/src
