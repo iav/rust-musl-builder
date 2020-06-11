@@ -3,11 +3,14 @@
 # arm)   --build-arg OPENSSL_TARGET=linux-armv4 --build-arg LD_MUSL_ARCH=armhf --build-arg  TRIPLET=arm-linux-gnueabihf --build-arg RUST_TARGET=armv7-unknown-linux-musleabihf
 # arm64) --build-arg OPENSSL_TARGET=linux-aarch64 --build-arg LD_MUSL_ARCH=aarch64 --build-arg TRIPLET=aarch64-linux-gnu --build-arg RUST_TARGET=aarch64-unknown-linux-musl
 
+# success:
+# docker build --build-arg OPENSSL_TARGET=linux-armv4 --build-arg LD_MUSL_ARCH=armhf --build-arg  TRIPLET=arm-linux-gnueabihf --build-arg RUST_TARGET=armv7-unknown-linux-musleabihf --build-arg RUSTUSERID=$(id -u) --build-arg BASE_IMAGE=ubuntu:19.10 --build-arg POSTGRESQL_VERSION=11.7 --build-arg OPENSSL_VERSION=1.1.1g -f Dockerfile -t b:ub1910-pg11.7-ssl1.1.1g ../..
+
 # 20.04 bug in sudo https://github.com/sudo-project/sudo/issues/42
 # workaround echo "Set disable_coredump false" >> /etc/sudo.conf
-ARG BASE_IMAGE=ubuntu:18.04
+#ARG BASE_IMAGE=ubuntu:18.04
 #ARG BASE_IMAGE=ubuntu:20.04
-#ARG BASE_IMAGE=ubuntu:19.10
+ARG BASE_IMAGE=ubuntu:19.10
 #ARG BASE_IMAGE=debian:10-slim
 
 FROM $BASE_IMAGE as builder
@@ -51,11 +54,11 @@ ARG TOOLCHAIN=stable
 
 # The OpenSSL version to use. We parameterize this because many Rust
 # projects will fail to build with 1.1.
-ARG OPENSSL_VERSION=1.1.1f
+ARG OPENSSL_VERSION=1.1.1g
 ENV OPENSSL_VERSION=$OPENSSL_VERSION
 
-ARG POSTGRESQL_VERSION=11.8
-
+ARG POSTGRESQL_VERSION=11.7
+ENV POSTGRESQL_VERSION=$POSTGRESQL_VERSION
 
 # Make sure we have basic dev tools for building C libraries.  Our goal
 # here is to support the musl-libc builds and Cargo builds needed for a
@@ -100,7 +103,7 @@ RUN    useradd rust --user-group --create-home --shell /bin/bash --groups sudo -
 # Static linking for C++ code
 RUN sudo ln -s "/usr/bin/g++" "/usr/bin/musl-g++"
 
-RUN echo "/musl/lib" >> /etc/ld-musl-${LD_MUSL_ARCH}.path
+RUN echo "$$MUSL_PREFIX/lib" >> /etc/ld-musl-${LD_MUSL_ARCH}.path
 
 # Allow sudo without a password.
 #ADD sudoers /etc/sudoers.d/nopasswd
@@ -168,7 +171,7 @@ RUN echo "Building libpq" && \
     tar xzf "postgresql-$POSTGRESQL_VERSION.tar.gz" && \
     cd "postgresql-$POSTGRESQL_VERSION" && \
     CC="musl-gcc -fPIE -pie" CPPFLAGS=-I$MUSL_PREFIX/include LDFLAGS=-L$MUSL_PREFIX/lib ./configure --with-openssl --without-readline --prefix=$MUSL_PREFIX && \
-    cd src/interfaces/libpq && make all-static-lib && sudo make install-lib-static && \
+    cd src/interfaces/libpq && make all-static-lib && sudo make install install-lib-static && \
     cd ../../bin/pg_config && make && sudo make install    && \
     rm -r /tmp/*
 
