@@ -103,7 +103,7 @@ RUN    useradd rust --user-group --create-home --shell /bin/bash --groups sudo -
 # Static linking for C++ code
 RUN sudo ln -s "/usr/bin/g++" "/usr/bin/musl-g++"
 
-RUN echo "$$MUSL_PREFIX/lib" >> /etc/ld-musl-${LD_MUSL_ARCH}.path
+RUN echo "$MUSL_PREFIX/lib" >> /etc/ld-musl-${LD_MUSL_ARCH}.path
 
 # Allow sudo without a password.
 #ADD sudoers /etc/sudoers.d/nopasswd
